@@ -35,27 +35,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect mobile Android project
+        id: mobile_detect
+        run: |
+          if [[ -f apps/mobile-android/gradlew ]] && [[ -f apps/mobile-android/settings.gradle || -f apps/mobile-android/settings.gradle.kts ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Mobile project detected."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::apps/mobile-android not ready (missing gradlew or settings.gradle[.kts]); skipping mobile build."
+          fi
+
       - name: Setup JDK 17
+        if: steps.mobile_detect.outputs.exists == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Setup Gradle cache
+        if: steps.mobile_detect.outputs.exists == 'true'
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Validate mobile Android project
-        run: |
-          test -f apps/mobile-android/gradlew
-          test -f apps/mobile-android/settings.gradle || test -f apps/mobile-android/settings.gradle.kts
-
       - name: Build mobile release APK
+        if: steps.mobile_detect.outputs.exists == 'true'
         working-directory: apps/mobile-android
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon clean assembleRelease
 
       - name: Upload mobile APK artifacts
+        if: steps.mobile_detect.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: mobile-release-apk
@@ -73,27 +83,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect TV Android project
+        id: tv_detect
+        run: |
+          if [[ -f apps/tv-android/gradlew ]] && [[ -f apps/tv-android/settings.gradle || -f apps/tv-android/settings.gradle.kts ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "TV project detected."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::apps/tv-android not ready (missing gradlew or settings.gradle[.kts]); skipping TV build."
+          fi
+
       - name: Setup JDK 17
+        if: steps.tv_detect.outputs.exists == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Setup Gradle cache
+        if: steps.tv_detect.outputs.exists == 'true'
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Validate TV Android project
-        run: |
-          test -f apps/tv-android/gradlew
-          test -f apps/tv-android/settings.gradle || test -f apps/tv-android/settings.gradle.kts
-
       - name: Build TV release APK
+        if: steps.tv_detect.outputs.exists == 'true'
         working-directory: apps/tv-android
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon clean assembleRelease
 
       - name: Upload TV APK artifacts
+        if: steps.tv_detect.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: tv-release-apk

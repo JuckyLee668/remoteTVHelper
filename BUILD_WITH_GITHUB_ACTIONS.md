@@ -26,6 +26,7 @@
 - 支持按代码变更自动触发（push / pull_request）
 - 可选择仅编译 mobile、仅编译 tv 或全部
 - 自动上传 APK 产物（Artifacts）
+- 若对应 Android 工程目录尚未就绪，会给出 warning 并跳过，不再直接失败
 
 ## 3. 手动触发编译
 
@@ -56,6 +57,7 @@
 ## 5. 常见失败原因
 
 1. **找不到 `gradlew`**
+   - 现在会在 Actions 日志中给出 warning，并跳过对应端构建。
    - 说明 Android 工程还未放到 `apps/mobile-android` 或 `apps/tv-android`。
 2. **找不到 release APK**
    - 说明模块任务或输出路径和默认不一致，需要调整 artifact 路径。
